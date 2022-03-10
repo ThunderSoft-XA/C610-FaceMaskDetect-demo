@@ -139,7 +139,7 @@ Run the **FaceMaskDetect** test demo.This test demo has only command line output
 
 ```
 $ cd /data/<source root dir>
-$ ./weston_dp_cmd helmet
+$ ./weston_dp_cmd facemask
 
 Notice:
 DP display uses weston graphical interface support, so I provide weston_dp_cmd script in the project root directory 
