@@ -1,0 +1,5 @@
+config {
+    model_path : "/data/FaceMaskDetect/models/mask/face_mask_detection.tflite"
+    runtime : CPU
+    data_format : NCHW 
+}

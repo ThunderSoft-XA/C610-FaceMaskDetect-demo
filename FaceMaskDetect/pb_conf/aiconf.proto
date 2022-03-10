@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package aicfg;
+
+enum RunTime {
+    CPU = 0;
+    GPU = 1;
+    DSP = 2;
+    APU = 3;
+    NNAPI = 4;
+}
+
+enum DataFormat {
+    NCHW = 0;
+    NHWC = 1;
+}
+
+message AIConfig {
+    string model_path = 1;
+    RunTime runtime = 2;
+    DataFormat data_format = 3;
+}
+
+message AISet {
+    repeated AIConfig config = 1; //If you need more than one, you need this modifier "repeated"
+}
