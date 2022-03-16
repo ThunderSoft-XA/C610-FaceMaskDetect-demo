@@ -85,11 +85,14 @@ void bodyInference()
             // cv::cvtColor(helmet_mat_source, helmet_mat,cv::COLOR_BGR2RGB);    helmet tflite model need BGR style
            cv::Mat inputBlob;
         //    blobFromImagesFromOpencv(helmet_mat,inputBlob, 1 , cv::Size(260, 260), cv::Scalar(0, 0, 0), false,false,CV_8U);
+            cv::Mat fact_mat;
             cvtColor(helmet_mat, inputBlob, COLOR_BGR2RGB);
-            vector<uchar> helmet_mat_vec = convertMat2Vector<uchar>(inputBlob);
+            cv::resize(inputBlob,fact_mat,cv::Size(260,260),cv::INTER_LINEAR);
+
+            vector<uchar> helmet_mat_vec = convertMat2Vector<uchar>(fact_mat);
             std::cout << "loading tflite inference data ........" << std::endl;
             // vector<float> helmet_mat_vec_float(helmet_mat_vec.begin(), helmet_mat_vec.end());
-            ai_inference->loadTfliteData<uchar>(helmet_mat.rows,helmet_mat.cols,helmet_mat.channels(),helmet_mat_vec);
+            ai_inference->loadTfliteData<uchar>(helmet_mat_vec,TRUE);
             std::vector<std::vector<float>> inference_result;
             ai_inference->doInference<float>(&inference_result);
 

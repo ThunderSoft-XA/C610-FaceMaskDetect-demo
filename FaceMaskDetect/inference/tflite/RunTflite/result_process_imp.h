@@ -65,16 +65,16 @@ void get_top_n(T* prediction, int prediction_size, size_t num_results,
 template <class T>
 void landmark_result(T* prediction, int prediction_size, std::vector<cv::Point3_<T>>* results,bool input_floating)
 {
-	const long count = prediction_size;  // NOLINT(runtime/int)
-	cv::Point3_<T> point_value;
-	for (int index = 0; index < (count + 1) /3; ++index) {
-		if (input_floating) {
-			point_value = cv::Point3_<T>(prediction[3*index],prediction[3*index+1],prediction[3*index+2]);
-		} else {
-			point_value = cv::Point3_<T>(prediction[3*index] /255.0,prediction[3*index+1]/255.0,prediction[3*index+2]/255.0);
-		}
-		results->push_back(point_value);
-	}
+    const long count = prediction_size;  // NOLINT(runtime/int)
+    cv::Point3_<T> point_value;
+    for (int index = 0; index < (count + 1) /3; ++index) {
+        if (input_floating) {
+            point_value = cv::Point3_<T>(prediction[3*index],prediction[3*index+1],prediction[3*index+2]);
+        } else {
+            point_value = cv::Point3_<T>(prediction[3*index] /255.0,prediction[3*index+1]/255.0,prediction[3*index+2]/255.0);
+        }
+        results->push_back(point_value);
+    }
 }
 
 //convert original size image to model wanted size image, from tflite example label_image
@@ -138,17 +138,17 @@ void resize(T* out, uint8_t* _input, int image_height, int image_width,
     interpreter->Invoke();
 
     
-    int fact_input = interpreter->inputs()[0];
-    auto output = interpreter->typed_tensor<float>(fact_input);
+    // int fact_input = interpreter->inputs()[0];
+    auto output = interpreter->typed_tensor<float>(2);
     auto output_number_of_pixels = wanted_height * wanted_width * wanted_channels;
     
-        for (int i = 0; i < output_number_of_pixels; i++) {
-            if (input_floating) {
-                out[i] = (output[i] - input_mean) / std_mean;
-            } else {
-                out[i] = (uint8_t)output[i];
-            }
-        }
+    for (int i = 0; i < output_number_of_pixels; i++) {
+      if (input_floating) {
+        out[i] = (output[i] - input_mean) / std_mean;
+      } else {
+        out[i] = (uint8_t)output[i];
+      }
+    }
     
 }
 

@@ -88,11 +88,13 @@ public:
             
             switch (interpreter->tensor(input)->type) {
                 case kTfLiteFloat32:
+                    std::cout << "need convert to float32 ......" << std::endl;
                     resize<float>(interpreter->typed_tensor<float>(input), _input_data.data(),
                                     image_height, image_width, image_channels, wanted_height,
-                                    wanted_width, wanted_channels,false, 127.5f, 127.5f);
+                                    wanted_width, wanted_channels,true, 127.5f, 127.5f);
                 break;
                 case kTfLiteUInt8:
+                    std::cout << "need convert to uint 8 ......" << std::endl;
                     resize<uint8_t>(interpreter->typed_tensor<uint8_t>(input), _input_data.data(),
                                     image_height, image_width, image_channels, wanted_height,
                                     wanted_width, wanted_channels,false, 127.5f, 127.5f);
@@ -104,6 +106,40 @@ public:
             }
         }
         
+    }
+
+    template<class T> void loadTfliteData(std::vector<T> _input_data,bool input_floating = false) {
+        // get input node and output node at load model and init interpreter
+        // const std::vector<int> inputs = this->interpreter->inputs();
+        // const std::vector<int> outputs = this->interpreter->outputs();
+        //record input,output node`s index value
+        this->input_index_vec = this->interpreter->inputs();
+        this->output_index_vec = this->interpreter->outputs();
+        // get fact the data size info of input node
+        TfLiteIntArray* dims;
+        for(auto input : this->input_index_vec) {
+            LOG(INFO) << "input node index value: " << input << std::endl;
+            dims = this->interpreter->tensor(input)->dims;
+            int wanted_height = dims->data[1];
+            int wanted_width = dims->data[2];
+            int wanted_channels = dims->data[3];
+
+            std::cout << "node " << input << ": wanted_height = " << wanted_height << \
+                ",wanted_width = " << wanted_width << ",wanted_channels = " << wanted_channels;
+            
+            auto output_number_of_pixels = wanted_height * wanted_width * wanted_channels;
+            if (input_floating) {
+                float * out = interpreter->typed_tensor<float>(input);
+                for (int i = 0; i < output_number_of_pixels; i++) {
+                    out[i] = (_input_data[i] - 127.5) / 127.5;
+                }
+            } else {
+                uint8_t * out = interpreter->typed_tensor<uint8_t>(input);
+                for (int i = 0; i < output_number_of_pixels; i++) {  
+                    out[i] = (uint8_t)_input_data[i];
+                }
+            }
+        }
     }
 
     template<class T> void doInference(std::vector<std::vector<T>>*_result)
